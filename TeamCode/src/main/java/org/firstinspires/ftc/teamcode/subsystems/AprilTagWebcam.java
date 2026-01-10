@@ -2,6 +2,10 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import android.util.Size;
 
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -73,6 +77,27 @@ public class AprilTagWebcam {
             }
         }
         return null;
+    }
+    public Action waitForAprilTag(){
+        return new WaitForAprilTag();
+    }
+
+    public class WaitForAprilTag implements Action{
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            update();
+            List<AprilTagDetection> detections = getDetectedTags();
+            for (int i = 0; i < detections.size(); i++){
+                AprilTagDetection detection = detections.get(i);
+                if (detection.id == 24 || detection.id == 20){
+                    detections.remove(i);
+                }
+            }
+            if (getDetectedTags().isEmpty()){
+                return true;
+            }
+            return false;
+        }
     }
 
     public void stop(){

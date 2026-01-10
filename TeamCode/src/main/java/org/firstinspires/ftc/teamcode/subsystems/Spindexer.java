@@ -52,12 +52,6 @@ public class Spindexer {
 
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
-            /*if (motifIndex < 3){
-                motifIndex++;
-            }
-            else{
-                motifIndex = 0;
-            }*/
             artifacts.add(artifacts.get(0));
             artifacts.remove(0);
             artifacts.add(0, artifacts.get(artifacts.size()-1));
@@ -106,7 +100,12 @@ public class Spindexer {
             Actions.runBlocking(new SleepAction(1));
             kicker1.setPosition(kicker1Idle);
             kicker2.setPosition(kicker2Idle);
-            motifIndex++;
+            if (motifIndex < 3){
+                motifIndex++;
+            }
+            else{
+                motifIndex = 0;
+            }
             return true;
         }
     }
