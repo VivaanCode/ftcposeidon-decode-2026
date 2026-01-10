@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 
-/*@Disabled()*/@TeleOp(name = "Teleop Pushbot (drive only)")
+@TeleOp(name = "Teleop Pushbot (drive only)")
 public class DriveOnly extends OpMode {
     private DcMotor frontLeft, frontRight, rearLeft, rearRight;
     @Override
@@ -27,7 +27,6 @@ public class DriveOnly extends OpMode {
 
         rearRight.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-
     }
 
     @Override

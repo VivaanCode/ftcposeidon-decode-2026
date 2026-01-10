@@ -1,0 +1,16 @@
+Expansion Hub:
+  Motors:
+    0:
+    1:
+    2: front-left
+    3: rear-left
+  Servos:
+    0:
+
+Control Hub
+    Motors:
+        0:
+        1:
+        2: intake-motor-2
+        3: intake-motor-1
+
