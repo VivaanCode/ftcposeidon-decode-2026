@@ -20,9 +20,13 @@ public class AprilTagWebcamTest extends OpMode {
     private final int targetedAprilTag = 20; // blue alliance
     // The april tag to be targeted (20 or 24, depending on red [24] or blue alliance [20])
 
-    private double turretPower = 0.01;
+    private double maximumTurretPower = 0.4; // -1 to 1
+
+    public double skewedValue = 9.6; // in centimeters
 
     private DcMotor turretRotation;
+
+    public double projectedPower;
 
     AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
 
@@ -42,14 +46,16 @@ public class AprilTagWebcamTest extends OpMode {
 
             telemetry.addData("aprilTagId String", aprilTagId.toString());
 
-            if (detectedAprilTag.ftcPose.x > (xTolerance+9.6)) {
+            projectedPower = Math.min(0.02*(Math.abs(detectedAprilTag.ftcPose.x+skewedValue)), maximumTurretPower);
+
+            if ((detectedAprilTag.ftcPose.x+skewedValue) > xTolerance) {
                 telemetry.addData("x movement", "right");
                 // move turret right
-                turretRotation.setPower(turretPower);
-            } else if (detectedAprilTag.ftcPose.x < ((-1*xTolerance)-9.6)) {
+                turretRotation.setPower(projectedPower);
+            } else if ((detectedAprilTag.ftcPose.x+skewedValue) < (-1*xTolerance)) {
                 telemetry.addData("x movement", "left");
                 // move turret left
-                turretRotation.setPower(turretPower);
+                turretRotation.setPower(-1*(projectedPower));
             } else {
                 telemetry.addData("x movement", "none");
                 turretRotation.setPower(0);
@@ -63,13 +69,13 @@ public class AprilTagWebcamTest extends OpMode {
 
 
             if (gamepad1.aWasPressed()) {
-                turretPower = (turretPower + 0.01);
-                telemetry.addData("turret power", turretPower);
+                maximumTurretPower = (maximumTurretPower + 0.05);
+                telemetry.addData("max turret power", maximumTurretPower);
             }
 
             if (gamepad1.bWasPressed()) {
-                turretPower = (turretPower - 0.01);
-                telemetry.addData("turret power", turretPower);
+                maximumTurretPower = (maximumTurretPower - 0.05);
+                telemetry.addData("max turret power", maximumTurretPower);
             }
 
         } else {
