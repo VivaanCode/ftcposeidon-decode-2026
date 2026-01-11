@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -11,7 +12,7 @@ import org.firstinspires.ftc.teamcode.subsystems.AprilTagWebcam;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 
-@TeleOp(name = "April tag test")
+@Autonomous(name = "April tag test")
 public class AprilTagWebcamTest extends OpMode {
 
     public final double xToleranceFactor = 0.7/200;
@@ -30,6 +31,10 @@ public class AprilTagWebcamTest extends OpMode {
 
     public double projectedPower;
 
+    private TwoDeadWheelLocalizer localizer;
+
+    public Pose2d pose;
+
     AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
 
     @Override
@@ -42,6 +47,8 @@ public class AprilTagWebcamTest extends OpMode {
     public void loop() {
         // update the vision portal
         aprilTagWebcam.update();
+        localizer.update();
+        pose = localizer.getPose();
         AprilTagDetection aprilTagId = aprilTagWebcam.getTagBySpecificId(targetedAprilTag);
         if (aprilTagId != null) {
             AprilTagDetection detectedAprilTag = aprilTagWebcam.getDetectionTelemetry(aprilTagId);
@@ -63,26 +70,28 @@ public class AprilTagWebcamTest extends OpMode {
                 turretRotation.setPower(0);
             }
 
+            telemetry.addData("position", pose);
             telemetry.addData("distance from tag", detectedAprilTag.ftcPose.y);
 
             telemetry.addData("x position", detectedAprilTag.ftcPose.x);
             // telemetry.addData("y position", detectedAprilTag.ftcPose.y);
             telemetry.addData("z position", detectedAprilTag.ftcPose.z);
+            telemetry.addData("max turret power", maximumTurretPower);
 
 
+/*
             if (gamepad1.a) {
                 maximumTurretPower = (maximumTurretPower + 0.05);
-                telemetry.addData("max turret power", maximumTurretPower);
             }
 
             if (gamepad1.b) {
                 maximumTurretPower = (maximumTurretPower - 0.05);
-                telemetry.addData("max turret power", maximumTurretPower);
             }
-
+*/
         } else {
             telemetry.addData("aprilTagId String", "none detected");
             turretRotation.setPower(0);
+
 
         }
         telemetry.update();

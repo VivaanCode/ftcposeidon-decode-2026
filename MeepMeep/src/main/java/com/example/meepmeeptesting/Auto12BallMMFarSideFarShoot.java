@@ -1,5 +1,6 @@
 /*
 
+MeepMeep
 AUTONOMOUS INFORMATION
 Balls shot: 12
 Starting side: FarSide
@@ -27,7 +28,7 @@ public class Auto12BallMMFarSideFarShoot {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .build();
 
-        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(64, 14, Math.toRadians(180)))
+        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(62, 14, Math.toRadians(180)))
 
                 // detect april tags and keep in field of view
                 .splineTo(new Vector2d(56, 14), Math.toRadians(180))
@@ -71,6 +72,8 @@ public class Auto12BallMMFarSideFarShoot {
 
                 .strafeTo(new Vector2d(64, 58))
                 //.splineToLinearHeading(new Pose2d(64, 58, Math.toRadians(0)), Math.toRadians(90))
+                .strafeTo(new Vector2d(50, 58))
+                .splineToLinearHeading(new Pose2d(56, 14, Math.toRadians(162)), 0)
 
 
                 .build());
