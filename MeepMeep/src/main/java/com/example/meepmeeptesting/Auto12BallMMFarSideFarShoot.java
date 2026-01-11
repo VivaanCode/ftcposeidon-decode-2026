@@ -70,7 +70,7 @@ public class Auto12BallMMFarSideFarShoot {
                 .splineToLinearHeading(new Pose2d(40, 58, Math.toRadians(0)), Math.toRadians(90))
 
 
-                .strafeTo(new Vector2d(64, 58))
+                .strafeTo(new Vector2d(60, 58))
                 //.splineToLinearHeading(new Pose2d(64, 58, Math.toRadians(0)), Math.toRadians(90))
                 .strafeTo(new Vector2d(50, 58))
                 .splineToLinearHeading(new Pose2d(56, 14, Math.toRadians(162)), 0)
