@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 // import com.qualcomm.robotcore.hardware.Servo;
@@ -10,19 +11,20 @@ import org.firstinspires.ftc.teamcode.subsystems.AprilTagWebcam;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 
-@Autonomous(name = "April tag test")
+@TeleOp(name = "April tag test")
 public class AprilTagWebcamTest extends OpMode {
 
-    public double xTolerance = 0.5;
+    public final double xToleranceFactor = 0.7/200;
     // The tolerance in horizontal centimeters that the camera will accept as the
     // april tag being in the desired location (9.6 inches right from center).
+
 
     private final int targetedAprilTag = 20; // blue alliance
     // The april tag to be targeted (20 or 24, depending on red [24] or blue alliance [20])
 
     private double maximumTurretPower = 0.4; // -1 to 1
 
-    public double skewedValue = 9.6; // in centimeters
+    public double skewedValue = 0; // in centimeters
 
     private DcMotor turretRotation;
 
@@ -47,7 +49,7 @@ public class AprilTagWebcamTest extends OpMode {
             telemetry.addData("aprilTagId String", aprilTagId.toString());
 
             projectedPower = Math.min(0.02*(Math.abs(detectedAprilTag.ftcPose.x+skewedValue)), maximumTurretPower);
-
+            double xTolerance = xToleranceFactor*detectedAprilTag.ftcPose.y;
             if ((detectedAprilTag.ftcPose.x+skewedValue) > xTolerance) {
                 telemetry.addData("x movement", "right");
                 // move turret right
@@ -68,18 +70,19 @@ public class AprilTagWebcamTest extends OpMode {
             telemetry.addData("z position", detectedAprilTag.ftcPose.z);
 
 
-            if (gamepad1.aWasPressed()) {
+            if (gamepad1.a) {
                 maximumTurretPower = (maximumTurretPower + 0.05);
                 telemetry.addData("max turret power", maximumTurretPower);
             }
 
-            if (gamepad1.bWasPressed()) {
+            if (gamepad1.b) {
                 maximumTurretPower = (maximumTurretPower - 0.05);
                 telemetry.addData("max turret power", maximumTurretPower);
             }
 
         } else {
             telemetry.addData("aprilTagId String", "none detected");
+            turretRotation.setPower(0);
 
         }
         telemetry.update();
@@ -89,7 +92,8 @@ public class AprilTagWebcamTest extends OpMode {
     public void initMotors() {
         turretRotation = hardwareMap.get(DcMotor.class, "turret-rotation");
         turretRotation.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        turretRotation.setDirection(DcMotorSimple.Direction.REVERSE);
+        //
+        // turretRotation.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
         /*

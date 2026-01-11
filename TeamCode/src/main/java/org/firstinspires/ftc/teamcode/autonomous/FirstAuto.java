@@ -17,6 +17,7 @@ public class FirstAuto extends LinearOpMode {
     AprilTagWebcam webcam;
     @Override
     public void runOpMode() throws InterruptedException {
+        waitForStart();
         drive = new MecanumDrive(hardwareMap, new Pose2d(64, 22, Math.toRadians(180)));
         TrajectoryActionBuilder aprilTagReadTrajectory = drive.actionBuilder(new Pose2d(64, 22, Math.toRadians(180)))
                 .lineToX(30);
