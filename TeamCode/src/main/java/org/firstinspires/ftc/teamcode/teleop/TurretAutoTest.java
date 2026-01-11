@@ -33,10 +33,12 @@ public class TurretAutoTest extends OpMode {
 
     @Override
     public void loop() {
-        Action alignTurret = turret.alignShooter();
-        Actions.runBlocking(
-                alignTurret
-        );
+        if (counter % 200 == 0) {
+            Action alignTurret = turret.alignShooter();
+            Actions.runBlocking(
+                    alignTurret
+            );
+        }
         counter++;
     }
 }
