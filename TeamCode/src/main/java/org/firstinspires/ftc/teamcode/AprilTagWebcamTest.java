@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -8,7 +10,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 // import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.subsystems.Alliance;
 import org.firstinspires.ftc.teamcode.subsystems.AprilTagWebcam;
+import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 
@@ -36,6 +40,7 @@ public class AprilTagWebcamTest extends OpMode {
     public Pose2d pose;
 
     AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
+    Turret turret = new Turret(hardwareMap, localizer, Alliance.BLUE_ALLIANCE);
 
     @Override
     public void init() {
@@ -89,9 +94,14 @@ public class AprilTagWebcamTest extends OpMode {
             }
 */
         } else {
-            telemetry.addData("aprilTagId String", "none detected");
-            turretRotation.setPower(0);
+            telemetry.addData("aprilTagId String", "none detected (using localization)");
+            turretRotation.setPower(0.01);
 
+            Actions.runBlocking(
+                    new SequentialAction(
+                            turret.alignShooter()
+                    )
+            );
 
         }
         telemetry.update();
