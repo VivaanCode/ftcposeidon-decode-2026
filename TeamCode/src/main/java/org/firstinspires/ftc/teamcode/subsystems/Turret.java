@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.Localizer;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.TwoDeadWheelLocalizer;
 
-public class Turret{
+public class Turret {
     public DcMotor rotator;
     private DcMotor shooter1;
     private DcMotor shooter2;
@@ -28,7 +28,8 @@ public class Turret{
     private final double encoderTicksToDegrees = 1;
     private final double encoderInitialPosition;
     private final Alliance alliance;
-    public Turret(HardwareMap hardwareMap, Localizer localizer, Alliance color){
+
+    public Turret(HardwareMap hardwareMap, Localizer localizer, Alliance color) {
         rotator = hardwareMap.get(DcMotorEx.class, "turret-rotation");
         encoderInitialPosition = rotator.getCurrentPosition();
         alliance = color;
@@ -36,17 +37,20 @@ public class Turret{
         shooter2 = hardwareMap.get(DcMotorEx.class, "shooter-motor-2");
         this.localizer = localizer;
     }
-    public Action warmUpShooter(){
+
+    public Action warmUpShooter() {
         return new WarmUpShooter();
     }
-    public Action alignShooter(){
+
+    public Action alignShooter() {
         return new AlignShooter();
     }
-    public class WarmUpShooter implements Action{
+
+    public class WarmUpShooter implements Action {
         @Override
-        public boolean run(@NonNull TelemetryPacket packet){
+        public boolean run(@NonNull TelemetryPacket packet) {
             Pose2d pose = localizer.getPose();
-            double distance = Math.sqrt(Math.pow(pose.position.x,2) + Math.pow(pose.position.y,2));
+            double distance = Math.sqrt(Math.pow(pose.position.x, 2) + Math.pow(pose.position.y, 2));
             shooter1.setPower(distanceFactor * distance + initialPower);
             shooter2.setPower(1);
             Actions.runBlocking(
@@ -55,29 +59,30 @@ public class Turret{
             return true;
         }
     }
-    public class AlignShooter implements Action{
+
+    public class AlignShooter implements Action {
         boolean initialized = false;
+
         @Override
-        public boolean run(@NonNull TelemetryPacket packet){
-            if (!initialized){
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
                 Pose2d pose = localizer.getPose();
                 Vector2d goalPose;
-                if (alliance == Alliance.RED_ALLIANCE){
+                if (alliance == Alliance.RED_ALLIANCE) {
                     goalPose = new Vector2d(-63, 59);
-                }
-                else{
+                } else {
                     goalPose = new Vector2d(-63, -59);
                 }
-                double degrees = Math.toDegrees(Math.atan2(goalPose.x - pose.position.x,goalPose.y -  pose.position.y) - pose.heading.toDouble());
-                if (degrees > 180){
+                double degrees = Math.toDegrees(Math.atan2(goalPose.x - pose.position.x, goalPose.y - pose.position.y) - pose.heading.toDouble());
+                if (degrees > 180) {
                     degrees -= 360;
                 }
-                double targetPosition = degrees*encoderTicksToDegrees - encoderInitialPosition;
-                rotator.setTargetPosition((int)Math.round(targetPosition));
+                double targetPosition = degrees * encoderTicksToDegrees - encoderInitialPosition;
+                rotator.setTargetPosition((int) Math.round(targetPosition));
                 rotator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 initialized = true;
             }
-            if (rotator.isBusy()){
+            if (rotator.isBusy()) {
                 rotator.setPower(1);
                 return true;
             }
