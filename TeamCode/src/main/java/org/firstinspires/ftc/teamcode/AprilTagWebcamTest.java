@@ -1,17 +1,21 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 // import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.subsystems.Alliance;
 import org.firstinspires.ftc.teamcode.subsystems.AprilTagWebcam;
+import org.firstinspires.ftc.teamcode.subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
@@ -35,25 +39,44 @@ public class AprilTagWebcamTest extends OpMode {
 
     public double projectedPower;
 
-    private TwoDeadWheelLocalizer localizer;
 
     public Pose2d pose;
+    public MecanumDrive drive;
 
     AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
-    Turret turret = new Turret(hardwareMap, localizer, Alliance.BLUE_ALLIANCE);
+
+    Turret turret;
 
     @Override
     public void init() {
         initMotors();
+        drive = new MecanumDrive(hardwareMap, new Pose2d(62, 14, Math.toRadians(180)));
+        turret = new Turret(hardwareMap, drive.localizer, Alliance.BLUE_ALLIANCE);
         aprilTagWebcam.init(hardwareMap, telemetry);
+        Servo kicker1 = hardwareMap.get(Servo.class, "servo-kicker-1");
+        kicker1.setDirection(Servo.Direction.REVERSE);
+        Servo kicker2 = hardwareMap.get(Servo.class, "servo-kicker-2");
+        //
+        // Servo spindexer = hardwareMap.get(Servo.class, "spindexer");
+
+        kicker1.setPosition(1);
+        kicker2.setPosition(1);
+        //spindexer.setPosition(0);
+        Actions.runBlocking(
+                new ParallelAction(
+                        new SleepAction(3)
+                )
+        );
+        kicker1.setPosition(0.1);
+        kicker2.setPosition(0.1);
     }
 
     @Override
     public void loop() {
         // update the vision portal
         aprilTagWebcam.update();
-        localizer.update();
-        pose = localizer.getPose();
+        /*localizer.update();
+        pose = localizer.getPose();*/
         AprilTagDetection aprilTagId = aprilTagWebcam.getTagBySpecificId(targetedAprilTag);
         if (aprilTagId != null) {
             AprilTagDetection detectedAprilTag = aprilTagWebcam.getDetectionTelemetry(aprilTagId);
@@ -75,7 +98,7 @@ public class AprilTagWebcamTest extends OpMode {
                 turretRotation.setPower(0);
             }
 
-            telemetry.addData("position", pose);
+            //telemetry.addData("position", pose);
             telemetry.addData("distance from tag", detectedAprilTag.ftcPose.y);
 
             telemetry.addData("x position", detectedAprilTag.ftcPose.x);
@@ -98,7 +121,8 @@ public class AprilTagWebcamTest extends OpMode {
             turretRotation.setPower(0.01);
 
             Actions.runBlocking(
-                    new SequentialAction(
+                    new ParallelAction(
+                        turret.warmUpShooter(),
                             turret.alignShooter()
                     )
             );

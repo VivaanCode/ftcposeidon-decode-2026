@@ -10,6 +10,7 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.configuration.ConfigurationType;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
@@ -25,7 +26,7 @@ public class Turret{
     private double distanceFactor = 0.1;
     private double initialPower = 0.2;
     private Localizer localizer;
-    private final double encoderTicksToDegrees = 1;
+    private final double encoderTicksToDegrees = 672/90.0;
     private final double encoderInitialPosition;
     private final Alliance alliance;
     public Turret(HardwareMap hardwareMap, Localizer localizer, Alliance color){
@@ -34,6 +35,7 @@ public class Turret{
         alliance = color;
         shooter1 = hardwareMap.get(DcMotorEx.class, "shooter-motor-1");
         shooter2 = hardwareMap.get(DcMotorEx.class, "shooter-motor-2");
+        shooter1.setDirection(DcMotorSimple.Direction.REVERSE);
         this.localizer = localizer;
     }
     public Action warmUpShooter(){
@@ -57,10 +59,11 @@ public class Turret{
     }
     public class AlignShooter implements Action{
         boolean initialized = false;
+        Pose2d pose;
         @Override
         public boolean run(@NonNull TelemetryPacket packet){
             if (!initialized){
-                Pose2d pose = localizer.getPose();
+                pose = localizer.getPose();
                 Vector2d goalPose;
                 if (alliance == Alliance.RED_ALLIANCE){
                     goalPose = new Vector2d(-63, 59);
@@ -71,6 +74,9 @@ public class Turret{
                 double degrees = Math.toDegrees(Math.atan2(goalPose.x - pose.position.x,goalPose.y -  pose.position.y) - pose.heading.toDouble());
                 if (degrees > 180){
                     degrees -= 360;
+                }
+                if (Math.abs(degrees) < 10){
+                    return false;
                 }
                 double targetPosition = degrees*encoderTicksToDegrees - encoderInitialPosition;
                 rotator.setTargetPosition((int)Math.round(targetPosition));

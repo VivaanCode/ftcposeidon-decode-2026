@@ -8,6 +8,8 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import java.util.Arrays;
 public class Spindexer {
     private Artifact[] pattern;
     private Servo spindexer;
+    private NormalizedColorSensor colorSensor;
 
     //stores the artifacts in clockwise order starting from the artifact nearest to intake
     private ArrayList<Artifact> artifacts;
@@ -24,14 +27,17 @@ public class Spindexer {
     private Servo kicker1;
     private Servo kicker2;
     private final double spindexIncrement = 0.2;
-    private final double kicker1Launch = 1.0;
-    private final double kicker1Idle = 0;
+    private final double kicker1Launch = 0.1;
+    private final double kicker1Idle = 1.0;
     private final double kicker2Launch = 0;
-    private final double kicker2Idle = 1.0;
+    private final double kicker2Idle = 0.1;
+    private final float colorSensorGain = 5;
     public Spindexer(HardwareMap hardwareMap){
         spindexer = hardwareMap.get(Servo.class, "spindexer");
-        kicker1 = hardwareMap.get(Servo.class, "kicker-1");
-        kicker2 = hardwareMap.get(Servo.class, "kicker-2");
+        colorSensor = hardwareMap.get(NormalizedColorSensor.class, "color-sensor");
+        colorSensor.setGain(colorSensorGain);
+        kicker1 = hardwareMap.get(Servo.class, "servo-kicker-1");
+        kicker2 = hardwareMap.get(Servo.class, "servo-kicker-2");
         artifacts = new ArrayList<>(Arrays.asList(Artifact.EMPTY, Artifact.EMPTY, Artifact.EMPTY));
     }
 
@@ -46,6 +52,20 @@ public class Spindexer {
                 new KickArtifact(),
                 ((artifacts.get(2) == Artifact.EMPTY)?(new IncrementSpindexer()):(new DecrementSpindexer()))
         );
+    }
+    public Artifact getColor(){
+        NormalizedRGBA colors = colorSensor.getNormalizedColors();
+        float normRed, normGreen, normBlue;
+        normRed = colors.red / colors.alpha;
+        normGreen = colors.green / colors.alpha;
+        normBlue = colors.blue / colors.alpha;
+
+        // TODO ADD if statements for specific colors added
+        return Artifact.EMPTY;
+    }
+
+    public NormalizedRGBA getColorRaw(){
+        return colorSensor.getNormalizedColors();
     }
 
     public class IncrementSpindexer implements Action {
