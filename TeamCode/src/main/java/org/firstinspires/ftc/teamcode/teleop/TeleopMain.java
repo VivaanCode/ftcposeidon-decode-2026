@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.java_websocket.handshake.HandshakeImpl1Server;
+
 import java.util.Objects;
 
 // spindexer
@@ -25,6 +27,9 @@ public class TeleopMain extends LinearOpMode {
     double KICKER_MIN_POSITION = 0;
     double SPINDEXER_ONE_ROTATION = 0;
     double SPINDEXER_POSITION = 0;
+    double KICKER_SERVO_POSITION = 0;
+    KickerPositionState KICKER_STAGE_1_POSITION = new KickerPositionState(0);
+    KickerPositionState KICKER_STAGE_2_POSITION = new KickerPositionState(0);
 
     // STATES
     double KICKER_LOWER_TIMER = -1;
@@ -37,6 +42,8 @@ public class TeleopMain extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         SPINDEXER_POSITION = spindexer.getPosition();
+        KICKER_SERVO_POSITION = kicker1.getPosition();
+
         initMotors();
         timer.reset();
         waitForStart();
@@ -76,18 +83,25 @@ public class TeleopMain extends LinearOpMode {
         // KICKER STATE
         if (Objects.equals(KICKER_STATE, "MOVE_DOWN")) {
             kicker1.setPosition(KICKER_MIN_POSITION);
-            kicker2.setPosition(KICKER_MIN_POSITION);
         }
         if (Objects.equals(KICKER_STATE, "MOVE_UP")) {
-            kicker1.setPosition(0.65);
-            kicker2.setPosition(0.65);
+            if (!KICKER_STAGE_1_POSITION.isSet) {
+                KICKER_STAGE_1_POSITION.isSet = true;
+                kicker1.setPosition(kicker1.getPosition() + 0.65);
+                KICKER_STAGE_1_POSITION.setKickerPosition(kicker1.getPosition() + 0.65);
+            }
         }
-        if (Objects.equals(KICKER_STATE, "MOVE_UP") && kicker1.getPosition() > 0.6) {
+        if (Objects.equals(KICKER_STATE, "MOVE_UP") && KICKER_STAGE_1_POSITION.withinThreshold(kicker1.getPosition())) {
             KICKER_STATE = "WAITING";
+            KICKER_STAGE_1_POSITION.isSet = false;
         }
         if (Objects.equals(SHOOTER_STATE, "LOAD_TO_SHOOTER")) {
-            kicker1.setPosition(KICKER_MAX_POSITION);
-            kicker2.setPosition(KICKER_MAX_POSITION);
+            if (!KICKER_STAGE_1_POSITION.isSet) {
+                KICKER_STAGE_1_POSITION.isSet = true;
+                KICKER_STAGE_1_POSITION.setKickerPosition(kicker1.getPosition() + 0.3);
+            }
+
+
         }
         if (Objects.equals(KICKER_STATE, "LOAD_TO_SHOOTER") && kicker1.getPosition() > 0.9) {
             // stop moving, but wait 1 second before moving back down
