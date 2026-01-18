@@ -28,7 +28,7 @@ public class VivaanTeleop extends OpMode {
 
     MecanumDrive drive;
 
-    Turret turret = new Turret(hardwareMap, drive.localizer, Alliance.BLUE_ALLIANCE);
+    Turret turret;
 
     private List<Action> runningActions = new ArrayList<>();
 
@@ -36,6 +36,7 @@ public class VivaanTeleop extends OpMode {
     @Override
     public void init() {
         drive = new MecanumDrive(hardwareMap, new Pose2d(62, 14, Math.toRadians(180)));
+        turret = new Turret(hardwareMap, drive.localizer, Alliance.BLUE_ALLIANCE)
     }
 
     /** This initializes the PoseUpdater, the mecanum drive motors, and the Panels telemetry. */
