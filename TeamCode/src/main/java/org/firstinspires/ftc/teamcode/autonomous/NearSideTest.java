@@ -12,7 +12,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.AprilTagWebcam;
 
-@Autonomous(name = "Far side test")
+/*
+servo locations
+0 - very bottom
+0.6 - ready time
+1 -
+ */
+@Autonomous(name = "near side test")
 public class NearSideTest extends LinearOpMode {
     MecanumDrive drive;
     AprilTagWebcam webcam;
@@ -25,17 +31,17 @@ public class NearSideTest extends LinearOpMode {
                 .turnTo(Math.toRadians(162));
 
         //webcam = new AprilTagWebcam();
-        Actions.runBlocking(
-                new SequentialAction(
-                        aprilTagReadTrajectory.build(),
-                        //webcam.waitForAprilTag(),
-                        new SleepAction(1.0)
-                        //firstThreeBallsTrajectory
-
-                        .build()
-
-                )
-        );
+//        Actions.runBlocking(
+//                new SequentialAction(
+//                        aprilTagReadTrajectory.build(),
+//                        //webcam.waitForAprilTag(),
+//                        new SleepAction(1.0)
+//                        //firstThreeBallsTrajectory
+//
+//                        .build()
+//
+//                )
+//        );
 
     }
 }
