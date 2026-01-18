@@ -49,7 +49,7 @@ public class TeleopMain extends LinearOpMode {
 
     Servo kicker1, kicker2, spindexer;
 
-    double KICKER_MAX_POSITION = 0.65;
+    double KICKER_MAX_POSITION = 1.0;
     double KICKER_MIN_POSITION = 0.1;
     double SPINDEXER_ONE_ROTATION = 0.66;
     double SPINDEXER_POSITION = 0;
@@ -82,12 +82,14 @@ public class TeleopMain extends LinearOpMode {
             handleManualInputs();
             if (gamepad2.y) {
                 shooter1.setPower(NEAR_SIDE_SHOOT_POWER);
+                shooter2.setPower(FAR_SIDE_SHOOT_POWER);
                 if (SPINDEXER_AUTO) setCorrectSpindex();
                 sleep(5000);
                 kickCurrentBall();
             }
             if (gamepad2.x){
                 shooter1.setPower(FAR_SIDE_SHOOT_POWER);
+                shooter2.setPower(FAR_SIDE_SHOOT_POWER);
                 //if (SPINDEXER_AUTO) setCorrectSpindex();
                 sleep(5000);
                 kickCurrentBall();
@@ -106,7 +108,7 @@ public class TeleopMain extends LinearOpMode {
             }*/
             if (gamepad2.a){
                 //if (SPINDEXER_AUTO) setToEmptyPosition();
-                intakeMotor.setPower(0.8);
+                intakeMotor.setPower(1);
             }
             if (gamepad2.b){
                 intakeMotor.setPower(0);
@@ -126,8 +128,8 @@ public class TeleopMain extends LinearOpMode {
             /*updateCamera();
             if (TURRET_AUTO) updateTurret();*/
 
-            shooter1.setPower(0.3);
-            shooter2.setPower(0.3);
+            shooter1.setPower(0.6);
+            shooter2.setPower(0.6);
 
             moveRobot(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
             telemetry.addData("Shooter time", shooterMotor.getVelocity());
@@ -284,6 +286,7 @@ public class TeleopMain extends LinearOpMode {
 
         spindexer = hardwareMap.get(Servo.class, "spindexer");
         kicker1 = hardwareMap.get(Servo.class, "servo-kicker-1");
+        kicker1.setDirection(Servo.Direction.REVERSE);
         kicker2 = hardwareMap.get(Servo.class, "servo-kicker-2");
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intake-motor");
         rotator = hardwareMap.get(DcMotorEx.class, "turret-rotation");
