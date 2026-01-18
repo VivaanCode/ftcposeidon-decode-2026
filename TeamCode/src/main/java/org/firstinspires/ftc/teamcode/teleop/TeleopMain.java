@@ -50,18 +50,19 @@ public class TeleopMain extends LinearOpMode {
     Servo kicker1, kicker2, spindexer;
 
     double KICKER_MAX_POSITION = 0.65;
-    double KICKER_MIN_POSITION = 0;
+    double KICKER_MIN_POSITION = 0.1;
     double SPINDEXER_ONE_ROTATION = 0.66;
     double SPINDEXER_POSITION = 0;
-    double KICKER_SERVO_POSITION = 0;
-    double NEAR_SIDE_SHOOT_POWER = 0.75;
+    double KICKER_SERVO_POSITION = 0.1;
+    double NEAR_SIDE_SHOOT_POWER = 0.9;
     double FAR_SIDE_SHOOT_POWER = 0.95;
     double encoderTicksToDegrees = 672/90.0;
     int encoderInitialPosition;
     AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
     boolean SPINDEXER_AUTO = false;
-    boolean TURRET_AUTO = true;
+    boolean TURRET_AUTO = false;
     int motifIndex = 0;
+
 
     String SHOOTER_STATE = "IDLE"; // IDLE, SPINUP, READY
     String KICKER_STATE = "IDLE"; // IDLE, MOVE_UP, WAITING, MOVE_DOWN, LOAD_TO_SHOOTER
@@ -79,27 +80,19 @@ public class TeleopMain extends LinearOpMode {
         while (opModeIsActive() && !isStopRequested()) {
             // DEBUG - SET KICKER DOWN MAX
             handleManualInputs();
-            if (gamepad2.a) {
-                kicker1.setPosition(KICKER_MAX_POSITION);
-                kicker2.setPosition(KICKER_MAX_POSITION);
-            }
-            if (gamepad2.b){
-                kicker1.setPosition(KICKER_MIN_POSITION);
-                kicker2.setPosition(KICKER_MIN_POSITION);
-            }
             if (gamepad2.y) {
                 shooter1.setPower(NEAR_SIDE_SHOOT_POWER);
                 if (SPINDEXER_AUTO) setCorrectSpindex();
-                sleep(1000);
+                sleep(5000);
                 kickCurrentBall();
             }
             if (gamepad2.x){
                 shooter1.setPower(FAR_SIDE_SHOOT_POWER);
-                if (SPINDEXER_AUTO) setCorrectSpindex();
-                sleep(1200);
+                //if (SPINDEXER_AUTO) setCorrectSpindex();
+                sleep(5000);
                 kickCurrentBall();
             }
-            if (gamepad2.start){
+            /*if (gamepad2.start){
                 TURRET_AUTO = true;
             }
             if (gamepad2.back) {
@@ -110,31 +103,37 @@ public class TeleopMain extends LinearOpMode {
             }
             if(gamepad1.back){
                 SPINDEXER_AUTO = false;
-            }
-            if (gamepad2.left_bumper){
-                if (SPINDEXER_AUTO) setToEmptyPosition();
+            }*/
+            if (gamepad2.a){
+                //if (SPINDEXER_AUTO) setToEmptyPosition();
                 intakeMotor.setPower(0.8);
             }
-            if (gamepad2.right_bumper){
+            if (gamepad2.b){
                 intakeMotor.setPower(0);
             }
 
-            if (intakeMotor.getPower() > 0 && SPINDEXER_AUTO){
+            /*if (intakeMotor.getPower() > 0 && SPINDEXER_AUTO){
                 Artifact detected = colorDetectHSV();
                 if (detected != Artifact.EMPTY) {
                     artifacts.set(0, detected);
                     intakeMotor.setPower(0);
                 }
-            }
+            }*/
 
 
             // Actions.runBlocking(turret.alignShooter());
             // move the robot
-            updateCamera();
-            if (TURRET_AUTO) updateTurret();
+            /*updateCamera();
+            if (TURRET_AUTO) updateTurret();*/
+
+            shooter1.setPower(0.3);
+            shooter2.setPower(0.3);
 
             moveRobot(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
             telemetry.addData("Shooter time", shooterMotor.getVelocity());
+            telemetry.addData("Pose", drive.localizer.getPose());
+            telemetry.addData("Intake power", intakeMotor.getPower());
+            telemetry.addData("Artifacts", artifacts.toString());
             telemetry.update();
         }
 
@@ -159,19 +158,21 @@ public class TeleopMain extends LinearOpMode {
         pose = localizer.getPose();*/
         List<AprilTagDetection> detections = aprilTagWebcam.getDetectedTags();
         if (!detections.isEmpty()) {
-            SPINDEXER_AUTO = true;
             for (AprilTagDetection detection : detections){
                 if (detection.id == 20 || detection.id == 24)continue;
                 else{
                     switch(detection.id){
                         case 20:
                             pattern = new Artifact[]{Artifact.PURPLE, Artifact.PURPLE, Artifact.GREEN};
+                            SPINDEXER_AUTO = true;
                             break;
                         case 21:
                             pattern = new Artifact[]{Artifact.GREEN, Artifact.PURPLE, Artifact.PURPLE};
+                            SPINDEXER_AUTO = true;
                             break;
                         case 22:
                             pattern = new Artifact[]{Artifact.PURPLE, Artifact.GREEN, Artifact.PURPLE};
+                            SPINDEXER_AUTO = true;
                             break;
                     }
                 }
@@ -199,21 +200,12 @@ public class TeleopMain extends LinearOpMode {
         return true;
     }
     private void handleManualInputs() {
-        if (gamepad1.left_trigger > 0.4) {
-            kicker1.setPosition(KICKER_MIN_POSITION);
-            kicker2.setPosition(KICKER_MIN_POSITION);
-        }
-        // DEBUG - SET KICKER UP MAX
-        if (gamepad1.right_trigger > 0.4) {
-            kicker1.setPosition(KICKER_MAX_POSITION);
-            kicker2.setPosition(KICKER_MAX_POSITION);
-        }
 
-        if (gamepad1.leftBumperWasPressed()) {
+        if (gamepad1.left_bumper) {
             SPINDEXER_POSITION -= SPINDEXER_ONE_ROTATION / 3;
             SPINDEXER_AUTO = false;
         }
-        if (gamepad1.leftBumperWasPressed()) {
+        if (gamepad1.right_bumper) {
             SPINDEXER_POSITION += SPINDEXER_ONE_ROTATION / 3;
             SPINDEXER_AUTO = false;
         }
@@ -231,7 +223,7 @@ public class TeleopMain extends LinearOpMode {
             motifIndex = 0;
         }
         artifacts.set(0, Artifact.EMPTY);
-        sleep(800);
+        sleep(300);
         kicker1.setPosition(KICKER_MIN_POSITION);
         kicker2.setPosition(KICKER_MIN_POSITION);
     }
