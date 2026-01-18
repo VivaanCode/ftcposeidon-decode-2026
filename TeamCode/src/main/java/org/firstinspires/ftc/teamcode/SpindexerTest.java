@@ -26,7 +26,7 @@ public class SpindexerTest extends LinearOpMode {
 
         final double spindexerIndexIncrement = 0.22;
         final double servoLauncherIdle = 0.95;
-        final double servoLauncherActive = 0.55;
+        final double servoLauncherActive = 0.65;
         waitForStart();
         while (opModeIsActive()) {
             if (gamepad1.dpad_up){

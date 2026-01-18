@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import android.graphics.Color;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -26,18 +28,19 @@ public class Spindexer {
     private int motifIndex;
     private Servo kicker1;
     private Servo kicker2;
-    private final double spindexIncrement = 0.2;
-    private final double kicker1Launch = 0.1;
-    private final double kicker1Idle = 1.0;
+    private final double spindexIncrement = 0.22;
+    private final double kicker1Launch = 0;
+    private final double kicker1Idle = 0.65;
     private final double kicker2Launch = 0;
-    private final double kicker2Idle = 0.1;
-    private final float colorSensorGain = 5;
+    private final double kicker2Idle = 0.65;
+    private final float colorSensorGain = 11;
     public Spindexer(HardwareMap hardwareMap){
         spindexer = hardwareMap.get(Servo.class, "spindexer");
         colorSensor = hardwareMap.get(NormalizedColorSensor.class, "color-sensor");
         colorSensor.setGain(colorSensorGain);
         kicker1 = hardwareMap.get(Servo.class, "servo-kicker-1");
         kicker2 = hardwareMap.get(Servo.class, "servo-kicker-2");
+        kicker1.setDirection(Servo.Direction.REVERSE);
         artifacts = new ArrayList<>(Arrays.asList(Artifact.EMPTY, Artifact.EMPTY, Artifact.EMPTY));
     }
 
@@ -53,15 +56,32 @@ public class Spindexer {
                 ((artifacts.get(2) == Artifact.EMPTY)?(new IncrementSpindexer()):(new DecrementSpindexer()))
         );
     }
-    public Artifact getColor(){
-        NormalizedRGBA colors = colorSensor.getNormalizedColors();
-        float normRed, normGreen, normBlue;
-        normRed = colors.red / colors.alpha;
-        normGreen = colors.green / colors.alpha;
-        normBlue = colors.blue / colors.alpha;
-
-        // TODO ADD if statements for specific colors added
-        return Artifact.EMPTY;
+    public Artifact addColor(Artifact color){
+        artifacts.add(0, color);
+        return color;
+    }
+    public boolean setToEmptySpot(){
+        if (artifacts.get(0) != Artifact.EMPTY){
+            if (artifacts.get(1) == Artifact.EMPTY){
+                artifacts.add(artifacts.get(0));
+                artifacts.remove(0);
+                Actions.runBlocking(
+                        new DecrementSpindexer()
+                );
+                return true;
+            }
+            else if (artifacts.get(2) == Artifact.EMPTY){
+                artifacts.add(0, artifacts.get(2));
+                artifacts.remove(2);
+                Actions.runBlocking(
+                        new IncrementSpindexer()
+                );
+                return true;
+            }else {
+                return false;
+            }
+        }
+        return true;
     }
 
     public NormalizedRGBA getColorRaw(){
@@ -128,5 +148,32 @@ public class Spindexer {
             }
             return true;
         }
+    }
+    private Artifact colorDetectHSV() {// Convert normalized RGB (0–1) to HSV
+        // Read colors
+        NormalizedRGBA colors = colorSensor.getNormalizedColors();
+        int r = (int) (colors.red * 255);
+        int g = (int) (colors.green * 255);
+        int b = (int) (colors.blue * 255);
+
+        float[] hsv = new float[3];
+        Color.RGBToHSV(r, g, b, hsv);
+
+        float hue = hsv[0];        // 0–360
+        float saturation = hsv[1]; // 0–1
+        float value = hsv[2];      // 0–1
+
+        // Detect color
+        Artifact color = Artifact.EMPTY;
+        if (hue > 150) {
+            color = Artifact.GREEN;;
+        }
+        if (hue > 175) {
+            color = Artifact.EMPTY;
+        }
+        if (hue > 200) {
+            color = Artifact.PURPLE;
+        }
+        return color;
     }
 }
