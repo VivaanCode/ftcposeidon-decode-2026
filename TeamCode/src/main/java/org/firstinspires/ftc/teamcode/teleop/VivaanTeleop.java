@@ -2,15 +2,23 @@ package org.firstinspires.ftc.teamcode.teleop;
 
 import static java.lang.Thread.sleep;
 
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Actions;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.acmerobotics.roadrunner.Action;
 
+import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Alliance;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 @TeleOp(name = "Vivaans tleeop caljfoierwhjg")
@@ -18,10 +26,17 @@ public class VivaanTeleop extends OpMode {
     private DcMotor frontLeft, frontRight, rearLeft, rearRight;
     Servo kicker1, kicker2;
 
+    MecanumDrive drive;
+
     Turret turret = new Turret(hardwareMap, drive.localizer, Alliance.BLUE_ALLIANCE);
 
+    private List<Action> runningActions = new ArrayList<>();
+
+
     @Override
-    public void init() {}
+    public void init() {
+        drive = new MecanumDrive(hardwareMap, new Pose2d(62, 14, Math.toRadians(180)));
+    }
 
     /** This initializes the PoseUpdater, the mecanum drive motors, and the Panels telemetry. */
     @Override
@@ -43,10 +58,10 @@ public class VivaanTeleop extends OpMode {
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
-    @Override
+    /*@Override
     public void start() {
 
-    }
+    }*/
 
     /**
      * This updates the robot's pose estimate, the simple mecanum drive, and updates the
@@ -55,16 +70,28 @@ public class VivaanTeleop extends OpMode {
     @Override
     public void loop() {
         moveRobot(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
+/// //////////////////////////////////////////////////
+        List<Action> newActions = new ArrayList<>();
+        for (Action action : runningActions) {
+            TelemetryPacket packet = new TelemetryPacket();
+            action.preview(packet.fieldOverlay());
+            if (action.run(packet)) {
+                newActions.add(action);
+            }
+        }
+        runningActions = newActions;
+        /// ////////////////////////////////// teleop actions code (no touchy)
+
         if (gamepad1.x){
             kicker1.setPosition(0.65);
             sleep(300);
             kicker1.setPosition(0.1);
         }
         if (gamepad1.y){
-            Actions.runBlocking(
-                    turret.alignShooter()
-            );
+            runningActions.add(turret.warmUpShooter());
         }
+
+
     }
     public void moveRobot(double leftStickX, double leftStickY, double rightStickX) {
         double speed = leftStickY;   // Forward/Backward movement
