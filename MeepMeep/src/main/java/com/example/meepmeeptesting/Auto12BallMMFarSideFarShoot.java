@@ -51,10 +51,10 @@ public class Auto12BallMMFarSideFarShoot {
                 .splineToLinearHeading(new Pose2d(56, 14, Math.toRadians(162)), 0)
                 .waitSeconds(0.8) // replace with shooting 3 intaked balls in motif
                 // shoot 3 more balls (est. 5-6s)
-                // start running the intake
 
 
                 .splineToLinearHeading(new Pose2d(12, 30, Math.toRadians(90)), Math.toRadians(90))
+                // start running the intake
                 .lineToY(54)
 
                 // stop running intake
@@ -66,9 +66,10 @@ public class Auto12BallMMFarSideFarShoot {
                 .waitSeconds(0.8) // replace with shooting 3 intaked balls in motif
                 // shoot 3 more balls (est. 5-6s) 36 54
 
-                // start running the intake
-                .splineToLinearHeading(new Pose2d(40, 58, Math.toRadians(0)), Math.toRadians(90))
 
+
+                .splineToLinearHeading(new Pose2d(40, 58, Math.toRadians(0)), Math.toRadians(90))
+                // start running the intake
 
                 .strafeTo(new Vector2d(60, 58))
                 //.splineToLinearHeading(new Pose2d(64, 58, Math.toRadians(0)), Math.toRadians(90))
