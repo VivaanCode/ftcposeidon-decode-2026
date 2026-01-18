@@ -25,10 +25,11 @@ public class Auto12BallMMNearSideNearShoot {
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
+                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 18)
                 .build();
 
-        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-15, 15, Math.toRadians(135)))
+        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-62, 40, Math.toRadians(0)))
+                .splineToLinearHeading(new Pose2d(-15, 15, Math.toRadians(180)), Math.PI/2)
                 .waitSeconds(1)  // shoot the preloaded balls
                 .splineTo(new Vector2d(-11.5, 36), Math.toRadians(90))
                 // start running intake
