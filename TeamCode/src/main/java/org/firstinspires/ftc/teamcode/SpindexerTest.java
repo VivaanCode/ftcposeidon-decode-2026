@@ -14,6 +14,10 @@ public class SpindexerTest extends LinearOpMode {
         Servo spindexer = hardwareMap.get(Servo.class, "spindexer");
         Servo kicker1 = hardwareMap.get(Servo.class, "servo-kicker-1");
         Servo kicker2 = hardwareMap.get(Servo.class, "servo-kicker-2");
+        kicker1.setDirection(Servo.Direction.REVERSE);
+        final double spindexerIndexIncrement = 0.22;
+        final double servoLauncherIdle = 0.95;
+        final double servoLauncherActive = 0.55;
         waitForStart();
         while (opModeIsActive()) {
             if (gamepad1.dpad_up){
@@ -30,6 +34,18 @@ public class SpindexerTest extends LinearOpMode {
             if (gamepad1.dpad_right) {
                 spindexer.setPosition(spindexer.getPosition() + 0.001);
             }
+            if(gamepad1.a){
+                kicker1.setPosition(servoLauncherActive);
+                kicker2.setPosition(servoLauncherActive);
+            }
+            if (gamepad1.b){
+                kicker2.setPosition(servoLauncherIdle);
+                kicker1.setPosition(servoLauncherIdle);
+            }
+            telemetry.addData("kicker1: ", kicker1.getPosition());
+            telemetry.addData("kicker2: ", kicker2.getPosition());
+            telemetry.addData("spindexer", spindexer.getPosition());
+            telemetry.update();
         }
     }
 }
