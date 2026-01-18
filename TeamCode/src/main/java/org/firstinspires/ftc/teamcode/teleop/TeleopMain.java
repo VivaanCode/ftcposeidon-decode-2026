@@ -51,8 +51,8 @@ public class TeleopMain extends LinearOpMode {
 
     double KICKER_MAX_POSITION = 1.0;
     double KICKER_MIN_POSITION = 0.1;
-    double SPINDEXER_ONE_ROTATION = 0.66;
-    double SPINDEXER_POSITION = 0;
+    double SPINDEXER_ONE_ROTATION = 0.6768;
+    double SPINDEXER_POSITION = 0.55606;
     double KICKER_SERVO_POSITION = 0.1;
     double NEAR_SIDE_SHOOT_POWER = 0.9;
     double FAR_SIDE_SHOOT_POWER = 0.95;
@@ -74,16 +74,14 @@ public class TeleopMain extends LinearOpMode {
         aprilTagWebcam.init(hardwareMap, telemetry);
         //Intake intakeMech = new Intake(hardwareMap);
         initMotors();
-        SPINDEXER_POSITION = spindexer.getPosition();
         KICKER_SERVO_POSITION = kicker1.getPosition();
         waitForStart();
         while (opModeIsActive() && !isStopRequested()) {
             // DEBUG - SET KICKER DOWN MAX
-            handleManualInputs();
             if (gamepad2.y) {
                 shooter1.setPower(NEAR_SIDE_SHOOT_POWER);
                 shooter2.setPower(FAR_SIDE_SHOOT_POWER);
-                if (SPINDEXER_AUTO) setCorrectSpindex();
+                //if (SPINDEXER_AUTO) setCorrectSpindex();
                 sleep(5000);
                 kickCurrentBall();
             }
@@ -131,7 +129,9 @@ public class TeleopMain extends LinearOpMode {
             shooter1.setPower(0.6);
             shooter2.setPower(0.6);
 
-            moveRobot(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
+            handleManualInputs();
+
+            moveRobot(gamepad1.left_stick_x, gamepad1.right_stick_x, gamepad1.left_stick_y);
             telemetry.addData("Shooter time", shooterMotor.getVelocity());
             telemetry.addData("Pose", drive.localizer.getPose());
             telemetry.addData("Intake power", intakeMotor.getPower());
@@ -211,6 +211,7 @@ public class TeleopMain extends LinearOpMode {
             SPINDEXER_POSITION += SPINDEXER_ONE_ROTATION / 3;
             SPINDEXER_AUTO = false;
         }
+        spindexer.setPosition(SPINDEXER_POSITION);
         shooter1.setPower(gamepad2.left_stick_y);
         shooter2.setPower(gamepad2.left_stick_y);
         intakeMotor.setPower(gamepad2.right_stick_x);
@@ -225,7 +226,7 @@ public class TeleopMain extends LinearOpMode {
             motifIndex = 0;
         }
         artifacts.set(0, Artifact.EMPTY);
-        sleep(300);
+        sleep(500);
         kicker1.setPosition(KICKER_MIN_POSITION);
         kicker2.setPosition(KICKER_MIN_POSITION);
     }
@@ -253,6 +254,7 @@ public class TeleopMain extends LinearOpMode {
         double speed = leftStickY;   // Forward/Backward movement
         double strafe = -leftStickX;  // Left/Right movement (strafe)
         double turn = -rightStickX;   // Rotation
+
 
         // Calculate each motor's power
         double frontLeftPower = (speed + turn + strafe);
