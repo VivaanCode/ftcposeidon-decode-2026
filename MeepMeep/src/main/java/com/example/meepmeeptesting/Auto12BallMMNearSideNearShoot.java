@@ -28,9 +28,9 @@ public class Auto12BallMMNearSideNearShoot {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 18)
                 .build();
 
-        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-62, 40, Math.toRadians(0)))
+        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-62, 37, Math.toRadians(0)))
                 .splineToLinearHeading(new Pose2d(-15, 15, Math.toRadians(180)), Math.PI/2)
-                .waitSeconds(1)  // shoot the preloaded balls
+                .waitSeconds(1)  // read the april tag, align turret, shoot the preloaded balls
                 .splineTo(new Vector2d(-11.5, 36), Math.toRadians(90))
                 // start running intake
                 .strafeTo(new Vector2d(-11.5, 56))
