@@ -9,11 +9,16 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.subsystems.Alliance;
+import org.firstinspires.ftc.teamcode.subsystems.Turret;
+
 
 @TeleOp(name = "Vivaans tleeop caljfoierwhjg")
 public class VivaanTeleop extends OpMode {
     private DcMotor frontLeft, frontRight, rearLeft, rearRight;
     Servo kicker1, kicker2;
+
+    Turret turret = new Turret(hardwareMap, drive.localizer, Alliance.BLUE_ALLIANCE);
 
     @Override
     public void init() {}
@@ -56,7 +61,9 @@ public class VivaanTeleop extends OpMode {
             kicker1.setPosition(0.1);
         }
         if (gamepad1.y){
-
+            Actions.runBlocking(
+                    turret.alignShooter()
+            );
         }
     }
     public void moveRobot(double leftStickX, double leftStickY, double rightStickX) {
